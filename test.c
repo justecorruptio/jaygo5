@@ -12,6 +12,7 @@ int test() {
 
     a = board_new();
 
+    /*
     board_play(a, to_pos(0, 0), BLACK);
     board_play(a, to_pos(0, 2), BLACK);
 
@@ -27,8 +28,27 @@ int test() {
 
     board_play(a, to_pos(2, 1), WHITE);
     board_play(a, to_pos(3, 0), WHITE);
+    */
 
-    //printf("LIB: %d\n", _has_lib(b->goban, to_pos(1, 1)));
+    board_play(a, to_pos(1, 0), WHITE);
+    board_play(a, to_pos(1, 1), WHITE);
+    board_play(a, to_pos(0, 1), WHITE);
+
+    board_play(a, to_pos(2, 0), BLACK);
+    board_play(a, to_pos(2, 1), BLACK);
+    board_play(a, to_pos(1, 2), BLACK);
+
+    board_play(a, to_pos(0, 0), BLACK);
+
+    board_play(a, to_pos(0, 2), BLACK);
+    board_play(a, to_pos(0, 0), BLACK);
+
+    board_play(a, to_pos(1, 0), WHITE);
+    board_play(a, to_pos(1, 1), WHITE);
+    board_play(a, to_pos(0, 1), WHITE);
+    board_play(a, to_pos(0, 0), WHITE);
+
+    board_play(a, to_pos(0, 0), BLACK);
 
     //board_print(a, stdout);
     board_free(a);
@@ -57,8 +77,6 @@ int main(int argc, char * argv[]){
     set_add(&t, 14);
     printf("%d\n", set_has(&t, 14));
     */
-    SetOf(81, Pos) t;
-    printf("%lu\n", sizeof(*&t));
 
     uint64_t i;
     struct timeval a, b;

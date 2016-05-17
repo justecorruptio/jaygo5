@@ -1,4 +1,4 @@
-CC=gcc -O3
+CC=gcc -O3 -g
 SOURCES=utils.c board.c
 
 all: jaygo

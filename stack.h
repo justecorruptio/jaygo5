@@ -28,12 +28,13 @@
 #define stack_get(stack, idx) \
     ((stack)->arr[idx])
 
-#define stack_iter(var, stack) \
-    for((stack)->iter = 0; \
-        (var = (stack)->arr[(stack)->iter]), \
-        (stack)->iter < (stack)->size; \
-        (stack)->iter ++)
+#define stack_iter(idx, var, stack) \
+    for(idx = 0; \
+        (var = (stack)->arr[idx]), \
+        idx < (stack)->size; \
+        idx ++)
 
+/*
 inline int _stack_has(void * stack, int s, uint64_t val) {
     int i;
     uint8_t * arr1;
@@ -54,6 +55,7 @@ inline int _stack_has(void * stack, int s, uint64_t val) {
 #define stack_has(stack, val) \
     (_stack_has((void *)(stack), \
         sizeof((stack)->arr[0]), (uint64_t)val))
+*/
 
 #define push stack_push
 #define pop stack_pop

@@ -2,61 +2,64 @@
 #include "stack.h"
 #include "utils.h"
 
-typedef StackOf(4, Pos) TonariList;
-TonariList TONARI[SIZE * SIZE];
+Pos TONARI[SIZE * SIZE][5];
 
 int board_initialize() {
     int i, j;
-    TonariList * tonari;
-    loop(i, SIZE) {
-        loop(j, SIZE) {
-            tonari = &TONARI[to_pos(i, j)];
-            if(i != 0) push(tonari, to_pos(i - 1, j));
-            if(j != 0) push(tonari, to_pos(i, j - 1));
-            if(i != SIZE - 1) push(tonari, to_pos(i + 1, j));
-            if(j != SIZE - 1) push(tonari, to_pos(i, j + 1));
+    Pos * tonari;
+    LOOP(i, SIZE) {
+        LOOP(j, SIZE) {
+            tonari = TONARI[to_pos(i, j)];
+            if(i != 0) *(tonari++) = to_pos(i - 1, j);
+            if(j != 0) *(tonari++) = to_pos(i, j - 1);
+            if(i != SIZE - 1) *(tonari++) = to_pos(i + 1, j);
+            if(j != SIZE - 1) *(tonari++) = to_pos(i, j + 1);
+            *tonari = nil;
         }
     }
     return 1;
 }
 
-typedef StackOf(SIZE * SIZE, Pos) PosList;
+inline int _search_til(Pos val, Pos * start, Pos * end) {
+    Pos * ptr;
+    for(ptr = start; ptr < end; ptr ++)
+        if (*ptr == val) return 1;
+    return 0;
+}
 
 int _has_lib(Color * goban, Pos pos) {
-    Pos tonari;
-    PosList frontier;
-    PosList inspected;
+    int i;
+    Pos tonari, *t;
+    Pos arr[SIZE * SIZE];
+    Pos * frontier = arr, * end = arr;
 
     Color color;
     Color init_color = goban[pos];
 
     if(init_color == EMPTY) return 1;
 
-    stack_clear(&frontier);
-    stack_clear(&inspected);
-
-    push(&inspected, pos);
+    *(end++) = pos;
+    frontier = end;
 
     while(1) {
-        stack_iter(tonari, &TONARI[pos]) {
+        ITER(tonari, t, TONARI[pos]) {
             color = goban[tonari];
-            if(color == EMPTY)
-                return 1;
-            else if(color == init_color &&
-                ! stack_has(&inspected, tonari)
+            if(color == EMPTY) return 1;
+            if(color == init_color &&
+                ! _search_til(tonari, arr, frontier)
             )
-                push(&frontier, tonari);
+                *(end++) = tonari;
         }
-        if(frontier.size == 0) return 0;
-        pos = pop(&frontier);
-        push(&inspected, pos);
+        if(frontier == end) return 0;
+        pos = *(frontier++);
     }
 }
 
 int _kill_group(Color * goban, Pos pos) {
-    Pos tonari;
-    PosList frontier;
-    PosList inspected;
+    int i;
+    Pos tonari, *t;
+    Pos arr[SIZE * SIZE];
+    Pos * frontier = arr, * end = arr;
 
     int killed = 0;
 
@@ -65,48 +68,46 @@ int _kill_group(Color * goban, Pos pos) {
 
     if (init_color == EMPTY) return 0;
 
-    stack_clear(&frontier);
-    stack_clear(&inspected);
-
-    push(&inspected, pos);
+    *(end++) = pos;
+    frontier = end;
 
     while(1) {
         goban[pos] = EMPTY;
         killed += 1;
-        stack_iter(tonari, &TONARI[pos]) {
+        ITER(tonari, t, TONARI[pos]) {
             color = goban[tonari];
             if(color == init_color &&
-                ! stack_has(&inspected, tonari)
+                ! _search_til(tonari, arr, frontier)
             )
-                push(&frontier, tonari);
+                *(end++) = tonari;
         }
-        if(frontier.size == 0) return killed;
-        pos = pop(&frontier);
-        push(&inspected, pos);
+        if(frontier == end) return killed;
+        pos = *(frontier++);
     }
 }
 
 int board_play(Board * self, Pos pos, Color color) {
-    Pos tonari;
-    TonariList killing;
+    int i;
+    Pos tonari, *t;
+    Pos killing[5], *k_ptr = killing;
 
     if(self->goban[pos]) return 0;
 
-    stack_clear(&killing);
-
     self->goban[pos] = color;
 
-    stack_iter(tonari, &TONARI[pos]) {
+    ITER(tonari, t, TONARI[pos]) {
         if(color == color_other(self->goban[tonari]) &&
             ! _has_lib(self->goban, tonari)
         )
-            push(&killing, tonari);
+            *(k_ptr++) = tonari;
     }
-    if(killing.size == 0 && ! _has_lib(self->goban, pos)) {
+    *k_ptr = nil;
+
+    if(k_ptr == killing && ! _has_lib(self->goban, pos)) {
         self->goban[pos] = EMPTY;
         return 0;
     }
-    stack_iter(tonari, &killing) {
+    ITER(tonari, t, killing) {
         self->captures[color - 1] +=
             _kill_group(self->goban, tonari);
     }
@@ -117,8 +118,8 @@ int board_play(Board * self, Pos pos, Color color) {
 int board_print(Board * self, FILE * fh) {
     Color color;
     int i, j;
-    loop(i, SIZE) {
-        loop(j, SIZE) {
+    LOOP(i, SIZE) {
+        LOOP(j, SIZE) {
             color = self->goban[to_pos(i, j)];
             fprintf(fh, "%c ", color == EMPTY ?
                 IS_HOSHI(i, j) ? '+' : '.'

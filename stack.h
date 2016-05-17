@@ -13,8 +13,6 @@
         type arr[max_size]; \
     }
 
-#define stack_init() {0}
-
 #define stack_clear(stack) \
     ((stack)->size = 0)
 

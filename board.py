@@ -116,15 +116,30 @@ class Game(object):
         s += "X:%d, O:%d+%s" % (self.captures[0], self.captures[1], KOMI)
         return s
 
+def test():
+    b = Game()
+    b.play((0, 0), BLACK);
+    b.play((0, 2), BLACK);
+
+    b.play((1, 0), WHITE);
+    b.play((1, 2), WHITE);
+    b.play((0, 3), WHITE);
+    b.play((0, 1), WHITE);
+
+    b.play((1, 1), BLACK);
+    b.play((2, 0), BLACK);
+    b.play((0, 0), BLACK);
+    b.play((1, 0), BLACK);
+
+    b.play((2, 1), WHITE);
+    b.play((3, 0), WHITE);
+
+    #print b
+
 if __name__ == '__main__':
-    g = Game()
-    g.play((0, 1), BLACK)
-    g.play((1, 0), BLACK)
-
-    g.play((2, 0), WHITE)
-    g.play((0, 2), WHITE)
-    g.play((1, 1), WHITE)
-
-    g.play((0, 0), WHITE)
-
-    print g
+    import time
+    a = time.time()
+    for i in xrange(1000000):
+        test()
+    b = time.time()
+    print "TIME:", b - a

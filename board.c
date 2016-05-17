@@ -24,13 +24,16 @@ typedef StackOf(SIZE * SIZE, Pos) PosList;
 
 int _has_lib(Color * goban, Pos pos) {
     Pos tonari;
-    PosList frontier = stack_init();
-    PosList inspected = stack_init();
+    PosList frontier;
+    PosList inspected;
 
     Color color;
     Color init_color = goban[pos];
 
     if(init_color == EMPTY) return 1;
+
+    stack_clear(&frontier);
+    stack_clear(&inspected);
 
     push(&inspected, pos);
 
@@ -52,8 +55,8 @@ int _has_lib(Color * goban, Pos pos) {
 
 int _kill_group(Color * goban, Pos pos) {
     Pos tonari;
-    PosList frontier = stack_init();
-    PosList inspected = stack_init();
+    PosList frontier;
+    PosList inspected;
 
     int killed = 0;
 
@@ -62,7 +65,11 @@ int _kill_group(Color * goban, Pos pos) {
 
     if (init_color == EMPTY) return 0;
 
+    stack_clear(&frontier);
+    stack_clear(&inspected);
+
     push(&inspected, pos);
+
     while(1) {
         goban[pos] = EMPTY;
         killed += 1;
@@ -81,9 +88,12 @@ int _kill_group(Color * goban, Pos pos) {
 
 int board_play(Board * self, Pos pos, Color color) {
     Pos tonari;
-    TonariList killing = stack_init();
+    TonariList killing;
 
     if(self->goban[pos]) return 0;
+
+    stack_clear(&killing);
+
     self->goban[pos] = color;
 
     stack_iter(tonari, &TONARI[pos]) {

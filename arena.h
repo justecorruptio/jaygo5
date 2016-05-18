@@ -19,6 +19,7 @@ typedef struct Arena {
 
 
 Arena * arena_new(size_t data_size, uint32_t max_num);
+void * arena_malloc(Arena * self);
 void * arena_calloc(Arena * self);
 void arena_dealloc(Arena * self, void * data);
 

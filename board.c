@@ -29,11 +29,29 @@ int board_destroy() {
 }
 
 Board * board_new() {
-    return (Board *)arena_calloc(ARENA);
+    Board * self = (Board *)arena_calloc(ARENA);
+    self->possible_ko = nil;
+    return self;
 }
 
 void board_free(Board * self) {
     arena_dealloc(ARENA, (void *)self);
+}
+
+Board * board_clone(Board * self) {
+    return (Board *)memcpy(
+        arena_calloc(ARENA),
+        self,
+        sizeof(Board)
+    );
+}
+
+uint64_t board_hash(Board * self) {
+    int i;
+    uint64_t hash = 0;
+    LOOP(i, SIZE * SIZE)
+        hash = hash << 2 | (self->goban[i] + (hash >> 62));
+    return hash;
 }
 
 inline int _search(Pos val, Pos * start, Pos * end) {
@@ -99,7 +117,7 @@ int _kill_group(Color * goban, Pos pos) {
 }
 
 int board_play(Board * self, Pos pos, Color color) {
-    int i;
+    int captures = 0;
     Pos tonari, *t;
     Pos killing[5], *k_ptr = killing;
 
@@ -119,10 +137,17 @@ int board_play(Board * self, Pos pos, Color color) {
         self->goban[pos] = EMPTY;
         return 0;
     }
-    ITER(tonari, t, killing) {
-        self->captures[color - 1] +=
-            _kill_group(self->goban, tonari);
+    ITER(tonari, t, killing)
+        captures += _kill_group(self->goban, tonari);
+
+    if (captures == 1 && self->possible_ko == killing[0]) {
+        self->goban[pos] = EMPTY;
+        self->goban[killing[0]] = color_other(color);
+        return 0;
     }
+
+    self->possible_ko = captures == 1 ? pos : nil;
+    self->captures[color - 1] += captures;
 
     return 1;
 }

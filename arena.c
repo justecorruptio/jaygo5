@@ -28,6 +28,17 @@ Arena * arena_new(size_t data_size, uint32_t max_num) {
     return self;
 }
 
+void * arena_malloc(Arena * self) {
+    ArenaNode * ptr;
+    if (! self->root) {
+        perror("ARENA OOM");
+        exit(1);
+    }
+    ptr = self->root;
+    self->root = ptr->next;
+    return (void*)(ptr->data);
+}
+
 void * arena_calloc(Arena * self) {
     ArenaNode * ptr;
     if (! self->root) {

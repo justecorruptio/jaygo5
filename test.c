@@ -23,6 +23,17 @@ int test() {
     board_play(a, to_pos(2, 1), WHITE);
     board_play(a, to_pos(3, 0), WHITE);
 
+    /*
+    board_play(a, to_pos(0, 0), BLACK);
+    board_play(a, to_pos(1, 1), BLACK);
+    board_play(a, to_pos(1, 0), WHITE);
+    board_play(a, to_pos(2, 1), WHITE);
+    board_play(a, to_pos(3, 0), WHITE);
+
+    board_play(a, to_pos(2, 0), BLACK);
+    board_play(a, to_pos(1, 0), WHITE);
+    */
+
     //board_print(a, stdout);
     board_free(a);
     return 0;

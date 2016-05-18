@@ -120,33 +120,34 @@ int board_play(Board * self, Pos pos, Color color) {
     int captures = 0;
     Pos tonari, *t;
     Pos killing[5], *k_ptr = killing;
+    Color * goban = self->goban;
 
-    if(self->goban[pos] != EMPTY) return 0;
+    if(goban[pos] != EMPTY) return 0;
 
-    self->goban[pos] = color;
+    goban[pos] = color;
 
     ITER(tonari, t, TONARI[pos]) {
-        if(color == color_other(self->goban[tonari]) &&
-            ! _has_lib(self->goban, tonari)
+        if(color == color_other(goban[tonari]) &&
+            !_has_lib(goban, tonari)
         )
             *(k_ptr++) = tonari;
     }
     *k_ptr = nil;
 
-    if(k_ptr == killing && ! _has_lib(self->goban, pos)) {
-        self->goban[pos] = EMPTY;
+    if(k_ptr == killing && ! _has_lib(goban, pos)) {
+        goban[pos] = EMPTY;
         return 0;
     }
     ITER(tonari, t, killing)
-        captures += _kill_group(self->goban, tonari);
+        captures += _kill_group(goban, tonari);
 
     if (captures == 1 && self->possible_ko == killing[0]) {
-        self->goban[pos] = EMPTY;
-        self->goban[killing[0]] = color_other(color);
+        goban[pos] = EMPTY;
+        goban[killing[0]] = color_other(color);
         return 0;
     }
 
-    self->possible_ko = captures == 1 ? pos : nil;
+    self->possible_ko = (captures == 1 ? pos : nil);
     self->captures[color - 1] += captures;
 
     return 1;

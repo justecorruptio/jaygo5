@@ -2,6 +2,8 @@
 #include "board.h"
 #include "utils.h"
 
+#define SPEED 1
+
 int test() {
     Board * a;
 
@@ -16,8 +18,10 @@ int test() {
     board_play(a, to_pos(0, 1), WHITE);
 
     board_play(a, to_pos(1, 1), BLACK);
+    board_play(a, to_pos(0, 0), BLACK); // SUICIDE
     board_play(a, to_pos(2, 0), BLACK);
     board_play(a, to_pos(0, 0), BLACK);
+    board_play(a, to_pos(1, 0), WHITE); // KO
     board_play(a, to_pos(1, 0), BLACK);
 
     board_play(a, to_pos(2, 1), WHITE);
@@ -34,7 +38,9 @@ int test() {
     board_play(a, to_pos(1, 0), WHITE);
     */
 
-    //board_print(a, stdout);
+#if !SPEED
+    board_print(a, stdout);
+#endif
     board_free(a);
     return 0;
 }
@@ -63,7 +69,11 @@ int main(int argc, char * argv[]){
     board_initialize();
 
     a = now();
+#if SPEED
     for(i = 0 ; i < 10000000; i ++){
+#else
+    for(i = 0 ; i < 1; i ++){
+#endif
         test();
     }
     b = now();

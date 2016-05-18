@@ -1,8 +1,9 @@
+#include "arena.h"
 #include "board.h"
-#include "stack.h"
 #include "utils.h"
 
 Pos TONARI[SIZE * SIZE][5];
+Arena * ARENA;
 
 int board_initialize() {
     int i, j;
@@ -17,10 +18,25 @@ int board_initialize() {
             *tonari = nil;
         }
     }
+
+    ARENA = arena_new(sizeof(Board), 1024);
     return 1;
 }
 
-inline int _search_til(Pos val, Pos * start, Pos * end) {
+int board_destroy() {
+    arena_free(ARENA);
+    return 1;
+}
+
+Board * board_new() {
+    return (Board *)arena_calloc(ARENA);
+}
+
+void board_free(Board * self) {
+    arena_dealloc(ARENA, (void *)self);
+}
+
+inline int _search(Pos val, Pos * start, Pos * end) {
     Pos * ptr;
     for(ptr = start; ptr < end; ptr ++)
         if (*ptr == val) return 1;
@@ -28,13 +44,11 @@ inline int _search_til(Pos val, Pos * start, Pos * end) {
 }
 
 int _has_lib(Color * goban, Pos pos) {
-    int i;
     Pos tonari, *t;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
 
-    Color color;
-    Color init_color = goban[pos];
+    Color color, init_color = goban[pos];
 
     if(init_color == EMPTY) return 1;
 
@@ -46,7 +60,7 @@ int _has_lib(Color * goban, Pos pos) {
             color = goban[tonari];
             if(color == EMPTY) return 1;
             if(color == init_color &&
-                ! _search_til(tonari, arr, frontier)
+                ! _search(tonari, arr, frontier)
             )
                 *(end++) = tonari;
         }
@@ -56,15 +70,13 @@ int _has_lib(Color * goban, Pos pos) {
 }
 
 int _kill_group(Color * goban, Pos pos) {
-    int i;
     Pos tonari, *t;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
 
     int killed = 0;
 
-    Color color;
-    Color init_color = goban[pos];
+    Color color, init_color = goban[pos];
 
     if (init_color == EMPTY) return 0;
 
@@ -77,7 +89,7 @@ int _kill_group(Color * goban, Pos pos) {
         ITER(tonari, t, TONARI[pos]) {
             color = goban[tonari];
             if(color == init_color &&
-                ! _search_til(tonari, arr, frontier)
+                ! _search(tonari, arr, frontier)
             )
                 *(end++) = tonari;
         }
@@ -91,7 +103,7 @@ int board_play(Board * self, Pos pos, Color color) {
     Pos tonari, *t;
     Pos killing[5], *k_ptr = killing;
 
-    if(self->goban[pos]) return 0;
+    if(self->goban[pos] != EMPTY) return 0;
 
     self->goban[pos] = color;
 

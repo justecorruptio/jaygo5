@@ -1,11 +1,6 @@
-#include <sys/time.h>
-
+#include "arena.h"
 #include "board.h"
-#include "set.h"
-#include "stack.h"
-
-typedef StackOf(4, Pos) Pos4;
-extern Pos4 TONARI[SIZE*SIZE];
+#include "utils.h"
 
 int test() {
     Board * a;
@@ -34,20 +29,37 @@ int test() {
 }
 
 int main(int argc, char * argv[]){
+    /*
+    Board * a;
+
+    Arena * arena = arena_new(sizeof(Board), 1024);
+
+    printf("%p\n", arena->root);
+    a = arena_calloc(arena);
+    printf("%p\n", arena->root);
+    printf("%p\n", a);
+    printf("%lx\n", sizeof(Board));
+
+    arena_dealloc(arena, a);
+    printf("%p\n", arena->root);
+
+    arena_free(arena);
+    */
 
     uint64_t i;
-    struct timeval a, b;
+    double a, b;
 
     board_initialize();
 
-    gettimeofday(&a, 0);
-    for(i = 0 ; i < 20000000; i ++){
+    a = now();
+    for(i = 0 ; i < 10000000; i ++){
         test();
     }
-    gettimeofday(&b, 0);
+    b = now();
 
-    printf("TIME: %f\n", (b.tv_sec + .000001 * b.tv_usec -
-        a.tv_sec - .000001 * a.tv_usec));
+    printf("TIME: %f\n", b - a);
+
+    board_destroy();
 
     return 0;
 }

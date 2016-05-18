@@ -34,6 +34,7 @@ typedef struct Board {
     Color goban[SIZE * SIZE];
 } Board;
 
+/*
 #define board_new() \
     ((Board *)calloc(1, sizeof(Board)))
 
@@ -42,8 +43,13 @@ typedef struct Board {
         malloc(sizeof(Board)), (self), sizeof(Board)))
 
 #define board_free free
+*/
 
 int board_initialize();
+int board_destroy();
+Board * board_new();
+void board_free(Board * self);
+
 int board_play(Board * self, Pos pos, Color color);
 int board_print(Board * self, FILE * fh);
 

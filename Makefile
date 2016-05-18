@@ -1,5 +1,5 @@
 CC=gcc -O3 -g
-SOURCES=utils.c board.c
+SOURCES=utils.c board.c arena.c
 
 all: jaygo
 

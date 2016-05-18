@@ -2,20 +2,30 @@
 #include "board.h"
 #include "utils.h"
 
-Pos TONARI[SIZE * SIZE][5];
+typedef uint64_t TonariList;
+#define ITER_TONARI(tonari, tlist, pos) \
+    for(tlist = TONARI[pos]; \
+    (tonari = (Pos)tlist) != nil; \
+    tlist >>= 8)
+
+TonariList TONARI[SIZE * SIZE];
 Arena * ARENA;
 
 int board_initialize() {
-    int i, j;
-    Pos * tonari;
+    int i, j, s;
+    TonariList t;
     LOOP(i, SIZE) {
         LOOP(j, SIZE) {
-            tonari = TONARI[to_pos(i, j)];
-            if(i != 0) *(tonari++) = to_pos(i - 1, j);
-            if(j != 0) *(tonari++) = to_pos(i, j - 1);
-            if(i != SIZE - 1) *(tonari++) = to_pos(i + 1, j);
-            if(j != SIZE - 1) *(tonari++) = to_pos(i, j + 1);
-            *tonari = nil;
+            t = 0;
+            s = 0;
+            if(i != 0) t |= to_pos(i - 1, j) << (8 * s++);
+            if(j != 0) t |= to_pos(i, j - 1) << (8 * s++);
+            if(i != SIZE - 1) t |= to_pos(i + 1, j) << (8 * s++);
+            if(j != SIZE - 1) t |= to_pos(i, j + 1) << (8 * s++);
+            if(s == 4) t |= 0xFF00000000;
+            else t |= (uint64_t)(0xFF << (8 * s));
+            t &= 0xFFFFFFFFFF;
+            TONARI[to_pos(i, j)] = t;
         }
     }
 
@@ -54,6 +64,7 @@ inline int _search(Pos val, Pos * start, Pos * end) {
 }
 
 int _has_lib(Color * goban, Pos pos) {
+    TonariList tlist;
     Pos tonari, *t;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
@@ -66,7 +77,7 @@ int _has_lib(Color * goban, Pos pos) {
     frontier = end;
 
     while(1) {
-        ITER(tonari, t, TONARI[pos]) {
+        ITER_TONARI(tonari, tlist, pos) {
             color = goban[tonari];
             if(color == EMPTY) return 1;
             if(color == init_color &&
@@ -80,6 +91,7 @@ int _has_lib(Color * goban, Pos pos) {
 }
 
 int _kill_group(Color * goban, Pos pos) {
+    TonariList tlist;
     Pos tonari, *t;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
@@ -96,7 +108,7 @@ int _kill_group(Color * goban, Pos pos) {
     while(1) {
         goban[pos] = EMPTY;
         killed += 1;
-        ITER(tonari, t, TONARI[pos]) {
+        ITER_TONARI(tonari, tlist, pos) {
             color = goban[tonari];
             if(color == init_color &&
                 ! _search(tonari, arr, frontier)
@@ -110,6 +122,7 @@ int _kill_group(Color * goban, Pos pos) {
 
 int board_play(Board * self, Pos pos, Color color) {
     int captures = 0;
+    TonariList tlist;
     Pos tonari, *t;
     Pos killing[5], *k_ptr = killing;
     Color * goban = self->goban;
@@ -118,7 +131,7 @@ int board_play(Board * self, Pos pos, Color color) {
 
     goban[pos] = color;
 
-    ITER(tonari, t, TONARI[pos]) {
+    ITER_TONARI(tonari, tlist, pos) {
         if(color == color_other(goban[tonari]) &&
             !_has_lib(goban, tonari)
         )

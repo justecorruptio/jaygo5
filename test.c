@@ -12,10 +12,12 @@ int test() {
     board_play(a, to_pos(0, 0), BLACK);
     board_play(a, to_pos(0, 2), BLACK);
 
+
     board_play(a, to_pos(1, 0), WHITE);
     board_play(a, to_pos(1, 2), WHITE);
     board_play(a, to_pos(0, 3), WHITE);
     board_play(a, to_pos(0, 1), WHITE);
+
 
     board_play(a, to_pos(1, 1), BLACK);
     board_play(a, to_pos(0, 0), BLACK); // SUICIDE

@@ -37,7 +37,6 @@ Board * board_new();
 void board_free(Board * self);
 
 Board * board_clone(Board * self);
-uint64_t board_hash(Board * self);
 
 int board_play(Board * self, Pos pos, Color color);
 int board_print(Board * self, FILE * fh);

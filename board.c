@@ -46,14 +46,6 @@ Board * board_clone(Board * self) {
     );
 }
 
-uint64_t board_hash(Board * self) {
-    int i;
-    uint64_t hash = 0;
-    LOOP(i, SIZE * SIZE)
-        hash = hash << 2 | (self->goban[i] + (hash >> 62));
-    return hash;
-}
-
 inline int _search(Pos val, Pos * start, Pos * end) {
     Pos * ptr;
     for(ptr = start; ptr < end; ptr ++)
@@ -134,10 +126,17 @@ int board_play(Board * self, Pos pos, Color color) {
     }
     *k_ptr = nil;
 
-    if(k_ptr == killing && ! _has_lib(goban, pos)) {
-        goban[pos] = EMPTY;
-        return 0;
+    if(k_ptr == killing) {
+        if(! _has_lib(goban, pos)) {
+            goban[pos] = EMPTY;
+            return 0;
+        }
+        else {
+            self->possible_ko = nil;
+            return 1;
+        }
     }
+
     ITER(tonari, t, killing)
         captures += _kill_group(goban, tonari);
 

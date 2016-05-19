@@ -46,7 +46,7 @@ Board * board_clone(Board * self) {
     );
 }
 
-inline int _search(Pos val, Pos * start, Pos * end) {
+int _search(Pos val, Pos * start, Pos * end) {
     Pos * ptr;
     for(ptr = start; ptr < end; ptr ++)
         if (*ptr == val) return 1;
@@ -58,9 +58,7 @@ int _has_lib(Color * goban, Pos pos) {
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
 
-    Color color, init_color = goban[pos];
-
-    if(init_color == EMPTY) return 1;
+    Color color, orig = goban[pos];
 
     *(end++) = pos;
     frontier = end;
@@ -69,9 +67,7 @@ int _has_lib(Color * goban, Pos pos) {
         ITER(tonari, t, TONARI[pos]) {
             color = goban[tonari];
             if(color == EMPTY) return 1;
-            if(color == init_color &&
-                ! _search(tonari, arr, frontier)
-            )
+            if(color == orig && !_search(tonari, arr, frontier))
                 *(end++) = tonari;
         }
         if(frontier == end) return 0;
@@ -86,9 +82,9 @@ int _kill_group(Color * goban, Pos pos) {
 
     int killed = 0;
 
-    Color color, init_color = goban[pos];
+    Color color, orig = goban[pos];
 
-    if (init_color == EMPTY) return 0;
+    if (orig == EMPTY) return 0;
 
     *(end++) = pos;
     frontier = end;
@@ -98,9 +94,7 @@ int _kill_group(Color * goban, Pos pos) {
         killed += 1;
         ITER(tonari, t, TONARI[pos]) {
             color = goban[tonari];
-            if(color == init_color &&
-                ! _search(tonari, arr, frontier)
-            )
+            if(color == orig && !_search(tonari, arr, frontier))
                 *(end++) = tonari;
         }
         if(frontier == end) return killed;
@@ -113,27 +107,26 @@ int board_play(Board * self, Pos pos, Color color) {
     Pos tonari, *t;
     Pos killing[5], *k_ptr = killing;
     Color * goban = self->goban;
+    Color opponent = color_other(color);
 
     if(goban[pos] != EMPTY) return 0;
 
     goban[pos] = color;
 
     ITER(tonari, t, TONARI[pos]) {
-        if(color == color_other(goban[tonari]) &&
-            !_has_lib(goban, tonari)
-        )
+        if(goban[tonari] == opponent && !_has_lib(goban, tonari))
             *(k_ptr++) = tonari;
     }
     *k_ptr = nil;
 
-    if(k_ptr == killing) {
-        if(! _has_lib(goban, pos)) {
-            goban[pos] = EMPTY;
-            return 0;
-        }
-        else {
+    if(k_ptr == killing) { // Empty killing list
+        if(_has_lib(goban, pos)) {
             self->possible_ko = nil;
             return 1;
+        }
+        else {
+            goban[pos] = EMPTY;
+            return 0;
         }
     }
 
@@ -142,7 +135,7 @@ int board_play(Board * self, Pos pos, Color color) {
 
     if (captures == 1 && self->possible_ko == killing[0]) {
         goban[pos] = EMPTY;
-        goban[killing[0]] = color_other(color);
+        goban[killing[0]] = opponent;
         return 0;
     }
 

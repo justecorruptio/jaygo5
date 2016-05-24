@@ -47,24 +47,22 @@ Board * board_clone(Board * self) {
 }
 
 int _search(Pos val, Pos * start, Pos * end) {
-    Pos * ptr;
-    for(ptr = start; ptr < end; ptr ++)
-        if (*ptr == val) return 1;
+    for(; start < end; start ++)
+        if (*start == val) return 1;
     return 0;
 }
 
 int _has_lib(Color * goban, Pos pos) {
-    Pos tonari, *t;
+    Pos tonari, *t_ptr;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
-
     Color color, orig = goban[pos];
 
     *(end++) = pos;
     frontier = end;
 
     while(1) {
-        ITER(tonari, t, TONARI[pos]) {
+        ITER(tonari, t_ptr, TONARI[pos]) {
             color = goban[tonari];
             if(color == EMPTY) return 1;
             if(color == orig && !_search(tonari, arr, frontier))
@@ -76,14 +74,12 @@ int _has_lib(Color * goban, Pos pos) {
 }
 
 int _kill_group(Color * goban, Pos pos) {
-    Pos tonari, *t;
+    Pos tonari, *t_ptr;
     Pos arr[SIZE * SIZE];
     Pos * frontier = arr, * end = arr;
-
-    int killed = 0;
-
     Color color, orig = goban[pos];
 
+    int count = 0;
     if (orig == EMPTY) return 0;
 
     *(end++) = pos;
@@ -91,13 +87,13 @@ int _kill_group(Color * goban, Pos pos) {
 
     while(1) {
         goban[pos] = EMPTY;
-        killed += 1;
-        ITER(tonari, t, TONARI[pos]) {
+        count += 1;
+        ITER(tonari, t_ptr, TONARI[pos]) {
             color = goban[tonari];
             if(color == orig && !_search(tonari, arr, frontier))
                 *(end++) = tonari;
         }
-        if(frontier == end) return killed;
+        if(frontier == end) return count;
         pos = *(frontier++);
     }
 }

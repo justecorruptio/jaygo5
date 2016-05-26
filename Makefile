@@ -1,5 +1,5 @@
 CC=gcc -O3 -g
-SOURCES=utils.c board.c arena.c
+SOURCES=utils.c board.c arena.c playout.c uct.c
 TEST_OPTS=-Wno-implicit-function-declaration
 
 all: jaygo

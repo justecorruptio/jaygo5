@@ -3,6 +3,7 @@
 #include "utils.h"
 
 Pos TONARI[SIZE * SIZE][5];
+Pos DIAGONALS[SIZE * SIZE][5];
 Arena * ARENA;
 
 int board_initialize() {
@@ -15,6 +16,21 @@ int board_initialize() {
             if(j != 0) *(tonari++) = to_pos(i, j - 1);
             if(i != SIZE - 1) *(tonari++) = to_pos(i + 1, j);
             if(j != SIZE - 1) *(tonari++) = to_pos(i, j + 1);
+            *tonari = nil;
+        }
+    }
+
+    LOOP(i, SIZE) {
+        LOOP(j, SIZE) {
+            tonari = DIAGONALS[to_pos(i, j)];
+            if(i != 0 && j != 0)
+                *(tonari++) = to_pos(i - 1, j - 1);
+            if(i != 0 && j != SIZE - 1)
+                *(tonari++) = to_pos(i - 1, j + 1);
+            if(i != SIZE - 1 && j != 0)
+                *(tonari++) = to_pos(i + 1, j - 1);
+            if(i != SIZE - 1 && j != SIZE - 1)
+                *(tonari++) = to_pos(i + 1, j + 1);
             *tonari = nil;
         }
     }

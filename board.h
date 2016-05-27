@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "arena.h"
+#include "utils.h"
+
 #define EMPTY 0
 #define BLACK 1
 #define WHITE 2

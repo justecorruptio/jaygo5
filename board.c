@@ -1,10 +1,8 @@
-#include "arena.h"
 #include "board.h"
-#include "utils.h"
 
 Pos TONARI[SIZE * SIZE][5];
 Pos DIAGONALS[SIZE * SIZE][5];
-Arena * ARENA;
+Arena * BOARD_ARENA;
 
 int board_initialize() {
     int i, j;
@@ -35,28 +33,28 @@ int board_initialize() {
         }
     }
 
-    ARENA = arena_new(sizeof(Board), 1024);
+    BOARD_ARENA = arena_new(sizeof(Board), 1024);
     return 1;
 }
 
 int board_destroy() {
-    arena_free(ARENA);
+    arena_free(BOARD_ARENA);
     return 1;
 }
 
 Board * board_new() {
-    Board * self = (Board *)arena_calloc(ARENA);
+    Board * self = (Board *)arena_calloc(BOARD_ARENA);
     self->possible_ko = nil;
     return self;
 }
 
 void board_free(Board * self) {
-    arena_dealloc(ARENA, (void *)self);
+    arena_dealloc(BOARD_ARENA, (void *)self);
 }
 
 Board * board_clone(Board * self) {
     return (Board *)memcpy(
-        arena_calloc(ARENA),
+        arena_malloc(BOARD_ARENA),
         self,
         sizeof(Board)
     );
@@ -81,7 +79,7 @@ int _has_lib(Color * goban, Pos pos) {
         ITER(tonari, t_ptr, TONARI[pos]) {
             color = goban[tonari];
             if(color == EMPTY) return 1;
-            if(color == orig && !_search(tonari, arr, frontier))
+            if(color == orig && !_search(tonari, arr, end))
                 *(end++) = tonari;
         }
         if(frontier == end) return 0;
@@ -106,7 +104,7 @@ int _kill_group(Color * goban, Pos pos) {
         count += 1;
         ITER(tonari, t_ptr, TONARI[pos]) {
             color = goban[tonari];
-            if(color == orig && !_search(tonari, arr, frontier))
+            if(color == orig && !_search(tonari, arr, end))
                 *(end++) = tonari;
         }
         if(frontier == end) return count;

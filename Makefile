@@ -1,3 +1,4 @@
+#CC=gcc -O1 -g -mmacosx-version-min=10.2
 CC=gcc -O3 -g
 SOURCES=utils.c board.c arena.c playout.c uct.c
 TEST_OPTS=-Wno-implicit-function-declaration
@@ -9,3 +10,6 @@ dev: dev.c $(SOURCES)
 
 test: test.c $(SOURCES)
 	$(CC) test.c $(SOURCES) $(TEST_OPTS) -o test_jaygo && test_jaygo
+
+jaygo: jaygo.c $(SOURCES)
+	$(CC) jaygo.c $(SOURCES) -o jaygo

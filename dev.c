@@ -11,6 +11,7 @@ int test() {
 
     a = board_new();
 
+    /*
     board_play(a, to_pos(0, 0), BLACK);
     board_play(a, to_pos(0, 2), BLACK);
 
@@ -28,8 +29,9 @@ int test() {
 
     board_play(a, to_pos(2, 1), WHITE);
     board_play(a, to_pos(3, 0), WHITE);
+    */
 
-    //playout_random_game(a, BLACK);
+    playout_random_game(a, BLACK, 0);
 
 #if !SPEED
     board_print(a, stdout);
@@ -48,9 +50,9 @@ int main(int argc, char * argv[]){
 
     a = now();
 #if SPEED
-    for(i = 0 ; i < 10000000; i ++){
+    for(i = 0 ; i < 100000; i ++){
 #else
-    for(i = 0 ; i < 1; i ++){
+    for(i = 0 ; i < 25; i ++){
 #endif
         test();
     }

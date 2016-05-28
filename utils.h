@@ -12,5 +12,6 @@
     for(ptr = (start); (var = *(ptr)) != nil; (ptr) ++)
 
 double now();
+int fast_rand();
 
 #endif

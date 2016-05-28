@@ -29,8 +29,8 @@ int _play_random_move(Board * board, Color color) {
     Pos pos;
     Color * goban = board->goban;
 
-    LOOP(i, 20) {
-        pos = rand() % (SIZE * SIZE);
+    LOOP(i, PLAY_RANDOM_MOVE_TRIES) {
+        pos = fast_rand() % (SIZE * SIZE);
         if(goban[pos] != EMPTY) continue;
         if(_is_eye(goban, pos, color)) continue;
         if(board_play(board, pos, color)){
@@ -51,7 +51,7 @@ int _exhaust_random_move(Board * board, Color color) {
         if(count == 0)
             possible[count] = pos;
         else {
-            i = rand() % count;
+            i = fast_rand() % count;
             possible[count] = possible[i];
             possible[i] = pos;
         }
@@ -67,10 +67,12 @@ int _exhaust_random_move(Board * board, Color color) {
     return 0;
 }
 
-int playout_random_game(Board * board, Color color) {
+int playout_random_game(Board * board, Color color, int turn) {
     int i, passes = 0;
-    LOOP(i, 200) {
-        if(_play_random_move(board, color))
+    for(i = turn; i < PLAY_RANDOM_GAME_MAX_TURNS; i ++) {
+        if(i < PLAY_RANDOM_GAME_TRY_THRESHOLD &&
+            _play_random_move(board, color)
+        )
             passes = 0;
         else if(_exhaust_random_move(board, color))
             passes = 0;

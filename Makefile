@@ -1,5 +1,5 @@
-#CC=gcc -O1 -g -mmacosx-version-min=10.2
-CC=gcc -O3 -g
+#CC=gcc -O1 -g -lm -mmacosx-version-min=10.2
+CC=gcc -O3 -g -lm
 SOURCES=utils.c board.c arena.c playout.c uct.c
 TEST_OPTS=-Wno-implicit-function-declaration
 

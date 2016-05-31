@@ -11,7 +11,8 @@
 #define PLAY_RANDOM_GAME_MAX_TURNS 200
 #define PLAY_RANDOM_GAME_TRY_THRESHOLD 100
 
-int _is_eye(Color * goban, Pos pos, Color color);
-int playout_random_game(Board * board, Color color, int turn);
+int is_eye(Color * goban, Pos pos, Color color);
+int playout_random_game(Board * board, Color color);
+Color playout_find_winner(Board * board);
 
 #endif

@@ -8,6 +8,7 @@
 
 int test() {
     Board * a;
+    Color color;
 
     a = board_new();
 
@@ -31,11 +32,12 @@ int test() {
     board_play(a, to_pos(3, 0), WHITE);
     */
 
-    playout_random_game(a, BLACK, 0);
+    playout_random_game(a, BLACK);
+    color = playout_find_winner(a);
 
 #if !SPEED
     board_print(a, stdout);
-    puts("");
+    printf("%s WINS!\n\n", color == BLACK? "BLACK": "WHITE");
 #endif
     board_free(a);
     return 0;

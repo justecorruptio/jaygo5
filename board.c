@@ -167,9 +167,13 @@ int board_print(Board * self, FILE * fh) {
                 color == BLACK ? 'X' : 'O'
             );
         }
-        fprintf(fh, "\n");
+        fprintf(fh, "%d\n", i);
     }
-    fprintf(fh, "X:%d, O:%d+%.1f\n",
+    LOOP(j, SIZE) {
+        fprintf(fh, "%d ", j);
+    }
+    fprintf(fh, "\n");
+    fprintf(fh, "X:%d, O:%d+%.1d.5\n",
         self->captures[0],
         self->captures[1],
         KOMI

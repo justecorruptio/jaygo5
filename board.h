@@ -14,7 +14,7 @@
 #define WHITE 2
 
 #define SIZE 9
-#define KOMI 6.5
+#define KOMI 1 // white wins ties
 
 #define IS_HOSHI(i, j) \
     ((i == 2 || i == 6) && (j == 2 || j == 6))

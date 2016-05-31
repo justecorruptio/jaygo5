@@ -3,7 +3,7 @@
 extern Pos TONARI[SIZE * SIZE][5];
 extern Pos DIAGONALS[SIZE * SIZE][5];
 
-int _is_eye(Color * goban, Pos pos, Color color) {
+int is_eye(Color * goban, Pos pos, Color color) {
     Pos tonari, *t_ptr;
     Color other = color_other(color);
     int other_count = 0;
@@ -32,7 +32,7 @@ int _play_random_move(Board * board, Color color) {
     LOOP(i, PLAY_RANDOM_MOVE_TRIES) {
         pos = fast_rand() % (SIZE * SIZE);
         if(goban[pos] != EMPTY) continue;
-        if(_is_eye(goban, pos, color)) continue;
+        if(is_eye(goban, pos, color)) continue;
         if(board_play(board, pos, color)){
             return 1;
         }
@@ -59,7 +59,7 @@ int _exhaust_random_move(Board * board, Color color) {
     }
     possible[count] = nil;
     ITER(pos, ptr, possible) {
-        if(_is_eye(goban, pos, color)) continue;
+        if(is_eye(goban, pos, color)) continue;
         if(board_play(board, pos, color)) {
             return 1;
         }
@@ -67,9 +67,9 @@ int _exhaust_random_move(Board * board, Color color) {
     return 0;
 }
 
-int playout_random_game(Board * board, Color color, int turn) {
+int playout_random_game(Board * board, Color color) {
     int i, passes = 0;
-    for(i = turn; i < PLAY_RANDOM_GAME_MAX_TURNS; i ++) {
+    LOOP(i, PLAY_RANDOM_GAME_MAX_TURNS) {
         if(i < PLAY_RANDOM_GAME_TRY_THRESHOLD &&
             _play_random_move(board, color)
         )
@@ -84,4 +84,20 @@ int playout_random_game(Board * board, Color color, int turn) {
         color = color_other(color);
     }
     return 0;
+}
+
+Color playout_find_winner(Board * board) {
+    Pos pos;
+    Color * goban = board->goban;
+    Color color;
+    int score[3] = {nil, 0, KOMI};
+
+    LOOP(pos, SIZE * SIZE) {
+        color = goban[pos];
+        if(color == EMPTY)
+            color = goban[TONARI[pos][0]];
+        score[color] ++;
+    }
+    if(score[1] > score[2]) return BLACK;
+    else return WHITE;
 }
